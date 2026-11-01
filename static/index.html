@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CareerForge — Resume, careers & jobs</title>
+<meta name="description" content="Build a resume, check it against ATS, see which roles fit you and find matching jobs.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231a1814'/%3E%3Cpath d='M8 23V9h11M8 16h8' stroke='%23e8590c' stroke-width='3.2' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="styles.css?v=8">
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap mast">
+    <a class="wordmark" href="#/builder">Career<em>Forge</em></a>
+    <nav id="tabs" aria-label="Sections">
+      <button data-tab="builder"><span>01</span>Build</button>
+      <button data-tab="analyzer"><span>02</span>Analyze</button>
+      <button data-tab="assistant"><span>03</span>Assistant</button>
+      <button data-tab="careers"><span>04</span>Careers</button>
+      <button data-tab="jobs"><span>05</span>Jobs</button>
+    </nav>
+    <div class="services" id="services" aria-label="Service status"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- 01 Build -->
+  <section id="builder" class="panel">
+    <div class="head">
+      <div>
+        <p class="kicker">01 — Resume builder</p>
+        <h1>Write it once. <em>Send it everywhere.</em></h1>
+      </div>
+      <div class="actions">
+        <button class="link" id="sampleBtn" type="button">Load sample</button>
+        <label class="link" id="importLbl">Import PDF<input type="file" id="importFile" accept="application/pdf,.pdf" hidden></label>
+        <button class="link danger" id="clearBtn" type="button">Clear</button>
+      </div>
+    </div>
+
+    <div class="desk">
+      <div class="editor">
+        <div class="gauge" aria-live="polite">
+          <div class="gauge-top"><span class="label">Completeness</span><span class="num" id="strengthPct">0</span></div>
+          <div class="track"><i id="strengthBar"></i></div>
+          <p id="strengthTip"></p>
+        </div>
+        <div id="form"></div>
+      </div>
+
+      <div class="proof">
+        <div class="proof-bar">
+          <div class="seg" id="templates" role="radiogroup" aria-label="Template">
+            <button type="button" data-tpl="modern" role="radio">Modern</button>
+            <button type="button" data-tpl="classic" role="radio">Classic</button>
+            <button type="button" data-tpl="minimal" role="radio">Minimal</button>
+          </div>
+          <button class="btn ink" id="pdfBtn" type="button">Download PDF</button>
+        </div>
+        <div class="sheet-wrap"><div id="preview" class="sheet tpl-modern"></div></div>
+        <p class="fine" id="saveNote">Saved in this browser.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 Analyze -->
+  <section id="analyzer" class="panel">
+    <div class="head">
+      <div>
+        <p class="kicker">02 — ATS analyzer</p>
+        <h1>How a screening system <em>reads you.</em></h1>
+        <p class="lede">An estimated ATS score, the sections you're missing and the specific lines to fix. It's an AI estimate, not a promise of how any employer scores you.</p>
+      </div>
+    </div>
+    <p id="aiOff" class="callout" hidden>The Analyzer needs a Gemini key. Add <code>GEMINI_API_KEY</code> to the server's <code>.env</code> and restart it.</p>
+    <div class="sources">
+      <div class="source">
+        <span class="label">Option A</span>
+        <h3>The resume you're building</h3>
+        <p>Uses what's on the Build tab right now.</p>
+        <button class="btn ink" id="analyzeBtn" type="button">Analyze my resume</button>
+      </div>
+      <label class="source drop" id="drop">
+        <span class="label">Option B</span>
+        <h3>An existing PDF</h3>
+        <p>Drop it here or click to choose. Text-based PDFs only, up to 5 MB.</p>
+        <span class="btn">Choose a PDF</span>
+        <input type="file" id="analyzeFile" accept="application/pdf,.pdf" hidden>
+      </label>
+    </div>
+    <div id="analyzeOut" aria-live="polite"></div>
+  </section>
+
+  <!-- 03 Assistant -->
+  <section id="assistant" class="panel">
+    <div class="head">
+      <div>
+        <p class="kicker">03 — Resume assistant</p>
+        <h1>A second pair of eyes <em>on every line.</em></h1>
+        <p class="lede">It reads the resume on the Build tab. Ask for a sharper summary, stronger project bullets or the skills a role expects.</p>
+      </div>
+      <div class="actions"><button class="link" id="chatClear" type="button">New conversation</button></div>
+    </div>
+    <div class="transcript">
+      <div id="chatLog" class="log" aria-live="polite"></div>
+      <div id="chatChips" class="prompts"></div>
+      <form id="chatForm" class="composer">
+        <input id="chatInput" type="text" maxlength="2000" placeholder="Rewrite my first project as three bullet points…" autocomplete="off" aria-label="Message">
+        <button class="btn ink" type="submit">Send</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- 04 Careers -->
+  <section id="careers" class="panel">
+    <div class="head">
+      <div>
+        <p class="kicker">04 — Career fit</p>
+        <h1>Roles your resume <em>already points to.</em></h1>
+        <p class="lede">Ranked by how much of each role's core skill set your skills, projects and experience show. Works without an AI key.</p>
+      </div>
+      <div class="actions"><button class="link" id="careersBtn" type="button">Recalculate</button></div>
+    </div>
+    <ol id="careersOut" class="roles"></ol>
+  </section>
+
+  <!-- 05 Jobs -->
+  <section id="jobs" class="panel">
+    <div class="head">
+      <div>
+        <p class="kicker">05 — Job finder</p>
+        <h1>Live openings, <em>ranked by fit.</em></h1>
+        <p class="lede">Pulled from job sites as you search. Every salary is shown in rupees; converted figures are marked approximate.</p>
+      </div>
+    </div>
+    <form id="jobForm" class="query">
+      <label class="q-main"><span class="label">Role or skill</span><input id="jq" type="text" maxlength="100" placeholder="Leave blank to use your top skills"></label>
+      <label><span class="label">Location</span><input id="jloc" type="text" maxlength="100" placeholder="Any, e.g. Bengaluru"></label>
+      <label><span class="label">Type</span><select id="jtype">
+        <option value="all">Any</option><option value="full-time">Full-time</option>
+        <option value="part-time">Part-time</option><option value="contract">Contract</option>
+      </select></label>
+      <label><span class="label">Experience</span><select id="jexp">
+        <option value="any">Any</option><option value="fresher">Fresher</option><option value="experienced">Experienced</option>
+      </select></label>
+      <label><span class="label">Posted</span><select id="jdays">
+        <option value="0">Any time</option><option value="1">24 hours</option><option value="7">7 days</option><option value="30">30 days</option>
+      </select></label>
+      <label><span class="label">Source</span><select id="jsrc">
+        <option value="all">All</option><option value="adzuna">Adzuna</option>
+        <option value="jobvetta">Jobvetta</option><option value="himalayas">Himalayas</option>
+      </select></label>
+      <button class="btn ink" type="submit">Search</button>
+    </form>
+    <div class="tally" id="resultsBar" hidden>
+      <p id="jobStatus"></p>
+      <label class="sort"><span class="label">Sort</span>
+        <select id="jsort"><option value="match">Best match</option><option value="new">Newest</option><option value="pay">Highest pay</option></select>
+      </label>
+    </div>
+    <div id="jobsOut" class="listings"></div>
+    <p class="fine" id="credit" hidden>Remote listings from <a href="https://himalayas.app" target="_blank" rel="noopener noreferrer">Himalayas</a>. Apply opens the job site's own page.</p>
+  </section>
+</main>
+
+<footer class="wrap colophon">
+  <span>CareerForge</span>
+  <span>Match scores compare the skills in your resume with each listing's text. Treat them as a guide, not a verdict.</span>
+</footer>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<script src="app.js?v=8"></script>
+</body>
+</html>

@@ -90,6 +90,16 @@ def resume_extract():
     return jsonify(text=extract_pdf_text(request.files.get("file")))
 
 
+@app.post("/api/resume/import")
+def resume_import():
+    """Reads an uploaded PDF resume into builder fields (needs Gemini)."""
+    text = extract_pdf_text(request.files.get("file"))[:12000]
+    r = resumes.normalize(ai.ask_json(ai.IMPORT_PROMPT, "Resume text:\n" + text))
+    if resumes.is_empty(r):
+        raise AppError("Nothing could be read from this resume. Try filling the form instead.")
+    return jsonify(resume=r)
+
+
 # ---- AI ----
 @app.post("/api/analyze")
 def analyze():
@@ -137,8 +147,10 @@ def job_match():
 def search_jobs():
     d = body()
     r = resumes.normalize(d.get("resume") or {})
+    days = d.get("days") if d.get("days") in (1, 3, 7, 14, 30) else 0
     found, status_, configured = jobs.search(str(d.get("q", "")).strip()[:100], str(d.get("location", "")).strip()[:100],
-                                             str(d.get("type", "all")), str(d.get("experience", "any")), str(d.get("source", "all")))
+                                             str(d.get("type", "all")), str(d.get("experience", "any")), str(d.get("source", "all")),
+                                             days)
     return jsonify(jobs=[{**j, **matching.job_match(r, j)} for j in found], sources=status_, configured=configured)
 
 
@@ -160,9 +172,11 @@ def unexpected(e):
     return jsonify(error="Something went wrong on the server."), 500
 
 
+# Runs on import too, so MySQL is set up under gunicorn as well as with `python app.py`.
+try:
+    db.init()
+except Exception:
+    logging.warning("MySQL tables could not be created; continuing without server storage.")
+
 if __name__ == "__main__":
-    try:
-        db.init()
-    except Exception:
-        logging.warning("MySQL tables could not be created; continuing without server storage.")
-    app.run(debug=False, port=5000)
+    app.run(debug=False, port=config.PORT)
