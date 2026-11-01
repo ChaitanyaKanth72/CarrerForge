@@ -1,0 +1,16 @@
+# Copy to .env (git-ignored) and fill in. Keys stay on the server.
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-flash-latest
+
+ADZUNA_APP_ID=
+ADZUNA_APP_KEY=
+ADZUNA_COUNTRY=in
+JOBVETTA_API_KEY=
+HIMALAYAS_ENABLED=true
+
+# MySQL is optional. Without it, resumes stay in browser LocalStorage and job results are not cached.
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=
+MYSQL_PASSWORD=
+MYSQL_DB=careerforge
